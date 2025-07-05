@@ -8,7 +8,7 @@ pygame.init()
 
 WIDTH, HEIGHT = 1200, 900
 FPS = 60
-ANT_COUNT = 10
+ANT_COUNT = 30
 RESOURCE_FONT = pygame.font.SysFont("Arial", 20)
 
 WHITE = (255, 255, 255)
@@ -23,7 +23,7 @@ DARK_BROWN = (100, 50, 10)
 SAND = (240, 230, 140)
 PINK = (255, 180, 220)
 
-resources = {"food": 50, "wood": 50, "fish": 50}
+resources = {"food": 500, "wood": 500, "fish": 500}
 
 ANT_ADULT_IMG = pygame.image.load(os.path.join('assets', 'ant_adult.png'))
 ANT_CHILD_IMG = pygame.image.load(os.path.join('assets', 'ant_child.png'))
@@ -130,19 +130,20 @@ class Ant:
         else:
             self.eating = False
 
-        if self.stamina <= 0:
+        if self.stamina <= 20:
             self.resting = True
         if self.resting:
             hub = next((b for b in buildings if b.type == "hub"), None)
             if hub:
                 self.move_towards(hub.x, hub.y)
                 if abs(self.x - hub.x) < 5 and abs(self.y - hub.y) < 5:
-                    self.stamina = min(100, self.stamina + 2)
-                    if self.stamina >= 100:
+                    self.stamina = min(100, self.stamina + 3)
+                    if self.stamina >= 80:
                         self.resting = False
+                    return
             else:
                 self.stamina = min(100, self.stamina + 1)
-            return
+                return
         else:
             self.stamina -= 0.01
 
@@ -196,7 +197,7 @@ class Ant:
             pygame.draw.rect(screen, GREEN, (rect.centerx-12, rect.top-8, int(24*self.stamina/100), 3))
 
     def is_happy(self):
-        return self.hunger < 70 and self.stamina > 30
+        return self.hunger < 80 and self.stamina > 20
 
 class FoodSource:
     def __init__(self, x, y, type="food"):
@@ -220,9 +221,7 @@ class Area:
         self.h = h
         self.type = type
         self.points = self.generate_blob(x, y, w, h)
-        self.rect = pygame.Rect(min(p[0] for p in self.points), min(p[1] for p in self.points),
-                                max(p[0] for p in self.points)-min(p[0] for p in self.points),
-                                max(p[1] for p in self.points)-min(p[1] for p in self.points))
+        self.rect = pygame.Rect(min(p[0] for p in self.points), min(p[1] for p in self.points),max(p[0] for p in self.points)-min(p[0] for p in self.points),max(p[1] for p in self.points)-min(p[1] for p in self.points))
 
     def generate_blob(self, x, y, w, h, n=10):
         center = (x + w//2, y + h//2)
